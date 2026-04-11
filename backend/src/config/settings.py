@@ -1,39 +1,46 @@
 import os
 from pathlib import Path
-from cryptography.fernet import Fernet
+from typing import Optional
+from dotenv import load_dotenv
 
 class Settings:
     def __init__(self):
-        self.base_dir = Path(__file__).parent.parent
-        self.data_dir = self.base_dir / "data"
-        self.logs_dir = self.base_dir / "logs"
+        # Load environment variables from .env file
+        # Look for .env in the project root (parent of backend directory)
+        project_root = Path(__file__).parent.parent.parent.parent
+        env_path = project_root / ".env"
+        if env_path.exists():
+            load_dotenv(env_path)
         
-        # Create directories if they don't exist
-        self.data_dir.mkdir(exist_ok=True)
-        self.logs_dir.mkdir(exist_ok=True)
+        # Environment
+        self.agent_env = os.getenv("AGENT_ENV", "development")
         
-        # Environment settings
-        self.environment = os.getenv("AGENT_ENV", "development")
-        self.debug = self.environment != "production"
+        # API Keys
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         
-        # Security settings
-        raw_key = os.getenv("ENCRYPTION_KEY", "").strip()
-        if not raw_key or raw_key.lower() == "auto-generated":
-            raise ValueError(
-                "ENCRYPTION_KEY is missing or still set to 'auto-generated'. "
-                "Run ./start.sh (it generates a key) or set ENCRYPTION_KEY to the output of: "
-                'python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"'
-            )
-        self.encryption_key = raw_key.encode() if isinstance(raw_key, str) else raw_key
-            
-        # Gemini API settings
-        self.gemini_api_key = os.getenv("GEMINI_API_KEY", "your-api-key-here")
+        # Security
+        self.encryption_key = os.getenv("ENCRYPTION_KEY")
         
-        # Database settings
-        self.db_path = self.data_dir / "agent_state.db"
+        # Logging
+        self.log_level = os.getenv("LOG_LEVEL", "INFO")
         
-        # Logging settings
-        self.log_level = "DEBUG" if self.debug else "INFO"
-        self.log_file = self.logs_dir / "agent.log"
+        # Database
+        self.db_path = Path("data/agent.db")
+        self.db_path.parent.mkdir(exist_ok=True)
+        
+        # Logging
+        self.log_file = Path("logs/agent.log")
+        self.log_file.parent.mkdir(exist_ok=True)
+        
+        # Debug mode
+        self.debug = self.agent_env == "development"
+        
+        # API Configuration
+        self.api_host = "0.0.0.0"
+        self.api_port = 8000
+        
+        # Frontend Configuration
+        self.frontend_url = "http://localhost:3000"
 
+# Global settings instance
 settings = Settings()
