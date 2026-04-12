@@ -13,10 +13,10 @@ import {
   Chip,
   List,
   ListItem,
-  ListItemText,
   CircularProgress
 } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:8000';
@@ -30,7 +30,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 5000);
+    const interval = setInterval(fetchStatus, 360000);
     return () => clearInterval(interval);
   }, []);
 
@@ -148,20 +148,30 @@ function Dashboard() {
             <Box sx={{ flexGrow: 1, overflow: 'auto', mb: 2 }}>
               <List>
                 {chatHistory.map((item, index) => (
-                  <ListItem key={index}>
-                    <ListItemText
-                      primary={
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Chip 
-                            size="small" 
-                            label={item.type} 
-                            color={item.type === 'user' ? 'primary' : item.type === 'agent' ? 'success' : 'error'}
-                          />
-                          <Typography variant="caption">{item.timestamp}</Typography>
-                        </Box>
-                      }
-                      secondary={item.content}
-                    />
+                  <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <Box display="flex" alignItems="center" gap={1} mb={1}>
+                      <Chip
+                        size="small"
+                        label={item.type}
+                        color={item.type === 'user' ? 'primary' : item.type === 'agent' ? 'success' : 'error'}
+                      />
+                      <Typography variant="caption">{item.timestamp}</Typography>
+                    </Box>
+                    {item.type === 'agent' ? (
+                      <Box sx={{
+                        width: '100%',
+                        '& h1, & h2, & h3, & h4, & h5, & h6': { fontSize: '1rem', mt: 1, mb: 0.5 },
+                        '& p': { m: 0, mb: 0.5 },
+                        '& ul, & ol': { pl: 2, m: 0, mb: 0.5 },
+                        '& li': { m: 0 },
+                        '& code': { backgroundColor: '#f5f5f5', px: 0.5, borderRadius: '3px', fontFamily: 'monospace', fontSize: '0.85rem' },
+                        '& pre': { backgroundColor: '#f5f5f5', p: 1, borderRadius: '4px', overflow: 'auto', fontSize: '0.85rem' }
+                      }}>
+                        <ReactMarkdown>{item.content}</ReactMarkdown>
+                      </Box>
+                    ) : (
+                      <Typography variant="body2" sx={{ width: '100%' }}>{item.content}</Typography>
+                    )}
                   </ListItem>
                 ))}
               </List>
