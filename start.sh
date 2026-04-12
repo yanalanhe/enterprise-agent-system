@@ -12,6 +12,15 @@ fi
 # Activate virtual environment
 source venv/Scripts/activate
 
+source venv/Scripts/activate
+
+if [ -z "$VIRTUAL_ENV" ]; then
+  echo "❌ Virtual environment did not activate (VIRTUAL_ENV is unset)."
+  exit 1
+fi
+
+echo "✅ Virtual environment active: $VIRTUAL_ENV"
+
 # Install backend dependencies
 echo "📚 Installing backend dependencies..."
 cd backend
