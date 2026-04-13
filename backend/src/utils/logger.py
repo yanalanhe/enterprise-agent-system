@@ -1,6 +1,5 @@
 import structlog
 import logging
-from pathlib import Path
 from config.settings import settings
 
 def configure_logging():
