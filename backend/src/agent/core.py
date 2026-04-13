@@ -40,7 +40,7 @@ class AgentCore:
         
         # Configure Gemini
         genai.configure(api_key=settings.gemini_api_key)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
+        self.model = genai.GenerativeModel('gemma-3-1b')
         
     async def initialize(self) -> bool:
         """Initialize agent with proper setup and validation"""
